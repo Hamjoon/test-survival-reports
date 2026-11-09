@@ -2,13 +2,13 @@
 
 ## Key findings
 
-1. **A reset restores the set only until the next large change to the scope classes, so the set at the last commit depends on whether such a change comes after the last reset.** On ojAlgo the commit #299 ("Additional file formats") comes after the last release reset (#204) and drops the regenerated Dev(scope) set from 462 to 153 of 494; the no-regeneration set had fallen to 8 of 353 at #144. On smallrye-config the refactoring of `ConfigMappings` at #478 comes after the last reset (#381) and leaves KTester at 15 of 55 and Ouédraogo at 0 of 49 under the release policy, while the Dev(scope) set re-established at #504 under the 50% policy ends at 242 of 246. On java-util the last reset (#213) comes after the large changes (#18, #134, #193) and every regenerated set ends above 93%; on jinjava the changes after the last reset (#64) cost the regenerated Dev(scope) set 139 of 1220 methods and the two LLM sets none.
+1. **A reset restores the set only until the next large change to the scope classes, so the set at the last commit depends on whether such a change comes after the last reset.** On ojAlgo the commit #299 ("Additional file formats") comes after the last release reset (#204) and drops the regenerated Dev(scope) set from 462 to 153 of 494; the one-time-generation set had fallen to 8 of 353 at #144. On smallrye-config the refactoring of `ConfigMappings` at #478 comes after the last reset (#381) and leaves KTester at 15 of 55 and Ouédraogo at 0 of 49 under the release policy, while the Dev(scope) set re-established at #504 under the 50% policy ends at 242 of 246. On java-util the last reset (#213) comes after the large changes (#18, #134, #193) and every regenerated set ends above 93%; on jinjava the changes after the last reset (#64) cost the regenerated Dev(scope) set 139 of 1220 methods and the two LLM sets none.
 2. **The developer tests execute more of the changed scope lines than either LLM group on all five projects, and regeneration does not close the gap.** Without regeneration Dev(scope) covers 50.7% of the changed lines on ojAlgo against 23.3% for KTester, 74.9% against 1.8% on smallrye-config, 96.4% against 0.0% on jinjava, 58.2% against 38.1% on java-util and 72.4% against 24.1% on logback (Table 2). The release resets add lines on both sides (KTester +21, +31, +7, +52 and +3; Dev(scope) +46, +34, +2, +82 and +1), so the gap in percentage points moves little: it widens on ojAlgo (27.4 → 34.0), narrows on logback (48.3 → 41.4) and moves by less than 4 points on the other three.
 3. **Survival and changed-line coverage have to be read separately.** On jinjava the KTester set of *t* passes at every commit (21/21) but executes 0 of the 165 changed scope lines, and so does the Ouédraogo set (0 of 165); Dev(scope) executes 159. Both generators produced passing tests only for `Functions` (KTester, all 21) or for `Functions`, `DeferredValueUtils`, `EagerBlockSetTagStrategy` and `EagerImportingStrategyFactory` (Ouédraogo, 89), while the changes in the range fall on the macro classes (#8, #28, #38), for which neither generator produced a passing test at *t*. After the two resets the KTester sets cover 7 and the Ouédraogo sets 1 of the 165 lines.
 
 ## Question
 
-A test set generated at a starting commit *t* breaks as the code under test moves on. If the generated tests are regenerated along the way, when should that happen and how much is gained? Three regeneration policies are compared against no regeneration on five Java projects, with two measurements taken at every commit after *t*: how many of the tests still pass (survival), and how many of the lines changed at that commit the surviving tests execute (changed-line coverage). New this week, the developer reference set is re-established at the reset commits as well, so that the LLM sets are compared with the developer tests of the same code.
+A test set generated at a starting commit *t* breaks as the code under test moves on. If the generated tests are regenerated along the way, when should that happen and how much is gained? Three regeneration policies are compared against one-time generation on five Java projects, with two measurements taken at every commit after *t*: how many of the tests still pass (survival), and how many of the lines changed at that commit the surviving tests execute (changed-line coverage). New this week, the developer reference set is re-established at the reset commits as well, so that the LLM sets are compared with the developer tests of the same code.
 
 ## Setup
 
@@ -34,7 +34,7 @@ Scope classes are public classes that change repeatedly inside the range and who
 | java-util | 346 | 171 | 375 |
 | logback | 45 | 159 | 169 |
 
-- **Dev(scope)**: the methods among the project's own tests that the build runs and that execute a line of a scope class. Under the two reset policies this set is re-established at the reset commit from the tests of that commit; under the fill policy and under no regeneration it is the set of *t*.
+- **Dev(scope)**: the methods among the project's own tests that the build runs and that execute a line of a scope class. Under the two reset policies this set is re-established at the reset commit from the tests of that commit; under the fill policy and under one-time generation it is the set of *t*.
 - **KTester**: Li et al., ICSE 2026, the released tool with its default of three repair rounds.
 - **Ouédraogo**: Ouédraogo et al., EMSE 2026, the five prompt templates with three adjustments: the signatures of the project types the class refers to are added to the prompt, the model is told to use only the API shown and no mocks, and missing imports are inserted after generation. Two generation rounds at every generation point.
 
@@ -42,9 +42,9 @@ Scope classes are public classes that change repeatedly inside the range and who
 
 | Policy | When | What |
 |---|---|---|
-| No regeneration | never | the set generated at *t* |
+| One-time generation | never | the set generated at *t* |
 | Reset at each release | two releases per project: ojAlgo v55.1.0 (#104) and v56.1.0 (#204); smallrye-config 3.11.2 (#194) and 3.16.0 (#381); jinjava 2.7.3 (#36) and 2.8.2 (#64); java-util 3.0.2 (#125) and 3.3.2 (#213); logback 1.5.1 (#32) and 1.5.6 (#65) | the group is discarded and generated again; Dev(scope) is re-established |
-| Reset when 50% broken | the first commit where at least half of the group has broken, read from the no-regeneration curve, once per group: ojAlgo #34 (Dev(scope), Ouédraogo); smallrye-config #504 (Dev(scope)), #130 (KTester), #30 (Ouédraogo); logback #28 (Dev(scope)), #21 (Ouédraogo); never for KTester on ojAlgo and logback and for every group on jinjava and java-util | the same |
+| Reset when 50% broken | the first commit where at least half of the group has broken, read from the one-time-generation curve, once per group: ojAlgo #34 (Dev(scope), Ouédraogo); smallrye-config #504 (Dev(scope)), #130 (KTester), #30 (Ouédraogo); logback #28 (Dev(scope)), #21 (Ouédraogo); never for KTester on ojAlgo and logback and for every group on jinjava and java-util | the same |
 | Fill when 50% broken | the same commit | the surviving tests are kept; new tests are added for the focal methods (Ouédraogo: the classes) of the broken ones, at most as many as broke per focal method; Dev(scope) stays the set of *t* |
 
 **Measurement.**
@@ -57,9 +57,9 @@ Scope classes are public classes that change repeatedly inside the range and who
 
 Table 1 gives survival at the last commit, Table 2 the changed-line coverage over the range and Table 3 how the sets at *t* were selected. The per-commit series (survival and changed-line coverage under each policy, one sheet per project) are in the shared spreadsheet: https://docs.google.com/spreadsheets/d/1MSN_emRi9AvQZrceqIOdhmyIRAZVpMfxNiYZWANVhZk/edit. There, a survival row is shown when a group lost three or more methods, and a coverage row when the commit changed ten or more scope lines or a group lost methods; the remaining commits are aggregated.
 
-**Table 1. Surviving methods at the last commit of the range** (alive / denominator of the last segment; number of regenerations in brackets). Under the two reset policies Dev(scope) is the developer tests of the reset commit, including tests added since *t* and tests that started to execute a scope class after *t* (segment denominators 353 → 368 → 494 on ojAlgo, 168 → 193 → 209 on smallrye-config, 590 → 1169 → 1220 on jinjava, 346 → 538 → 554 on java-util, 45 → 39 → 39 on logback), so its percentages there are not comparable with the no-regeneration column; under the fill policy it is the set of *t*. Where the 50% trigger did not fire (jinjava and java-util; KTester on ojAlgo and logback), the two 50% columns repeat the no-regeneration column.
+**Table 1. Surviving methods at the last commit of the range** (alive / denominator of the last segment; number of regenerations in brackets). Under the two reset policies Dev(scope) is the developer tests of the reset commit, including tests added since *t* and tests that started to execute a scope class after *t* (segment denominators 353 → 368 → 494 on ojAlgo, 168 → 193 → 209 on smallrye-config, 590 → 1169 → 1220 on jinjava, 346 → 538 → 554 on java-util, 45 → 39 → 39 on logback), so its percentages there are not comparable with the one-time-generation column; under the fill policy it is the set of *t*. Where the 50% trigger did not fire (jinjava and java-util; KTester on ojAlgo and logback), the two 50% columns repeat the one-time-generation column.
 
-| Project | Group | No regeneration | Reset at each release | Reset when 50% broken | Fill when 50% broken |
+| Project | Group | One-time generation | Reset at each release | Reset when 50% broken | Fill when 50% broken |
 |---|---|---|---|---|---|
 | ojAlgo | Dev(scope) | 3/353 (0.8%) | 153/494 (31.0%) [2 regen] | 34/351 (9.7%) [1 regen] | 3/353 (0.8%) |
 |  | KTester | 181/197 (91.9%) | 143/149 (96.0%) [2 regen] | 181/197 (91.9%) | 181/197 (91.9%) |
@@ -77,9 +77,9 @@ Table 1 gives survival at the last commit, Table 2 the changed-line coverage ove
 |  | KTester | 145/159 (91.2%) | 167/171 (97.7%) [2 regen] | 145/159 (91.2%) | 145/159 (91.2%) |
 |  | Ouédraogo | 47/169 (27.8%) | 34/34 (100.0%) [2 regen] | 35/66 (53.0%) [1 regen] | 77/108 (71.3%) [1 regen] |
 
-**Table 2. Changed scope lines executed by the surviving tests** (lines executed, share of the executable scope lines changed in the range; the number of changed lines is given with the project). A line counts as covered when a method alive at that commit executes it, so a set that breaks early covers only the lines changed before it broke; read with Table 1. "=" means the same as the no-regeneration column because the trigger did not fire for that group. A line changed at several commits is counted at each of them.
+**Table 2. Changed scope lines executed by the surviving tests** (lines executed, share of the executable scope lines changed in the range; the number of changed lines is given with the project). A line counts as covered when a method alive at that commit executes it, so a set that breaks early covers only the lines changed before it broke; read with Table 1. "=" means the same as the one-time-generation column because the trigger did not fire for that group. A line changed at several commits is counted at each of them.
 
-| Project | Group | No regeneration | Reset at each release | Reset when 50% broken | Fill when 50% broken |
+| Project | Group | One-time generation | Reset at each release | Reset when 50% broken | Fill when 50% broken |
 |---|---|---|---|---|---|
 | ojAlgo (377 lines) | Dev(scope) | 191 (50.7%) | 237 (62.9%) | 215 (57.0%) | = |
 |  | KTester | 88 (23.3%) | 109 (28.9%) | = | = |
@@ -97,7 +97,7 @@ Table 1 gives survival at the last commit, Table 2 the changed-line coverage ove
 |  | KTester | 7 (24.1%) | 10 (34.5%) | = | = |
 |  | Ouédraogo | 10 (34.5%) | 10 (34.5%) | 14 (48.3%) | 13 (44.8%) |
 
-**Table 3. Selection of the LLM sets at *t*** (generated methods → methods passing one run → after removing duplicates; the last column is the no-regeneration denominator). Ouédraogo rows sum its two generation rounds.
+**Table 3. Selection of the LLM sets at *t*** (generated methods → methods passing one run → after removing duplicates; the last column is the one-time-generation denominator). Ouédraogo rows sum its two generation rounds.
 
 | Project | Group | Generation runs | Generated methods | Passed at *t* | Duplicates removed | Set at *t* |
 |---|---|---:|---:|---:|---:|---:|
@@ -126,8 +126,8 @@ Table 1 gives survival at the last commit, Table 2 the changed-line coverage ove
 
 ## Repository
 
-Report: https://github.com/Hamjoon/test-survival-reports, `2026-11-week1-regen-policies/regen-policies-report.md` (this file). Experiment branches `experiment/2026-11-week1-<project>-regen-policies` in `Hamjoon/ojAlgo`, `Hamjoon/smallrye-config`, `Hamjoon/jinjava`, `Hamjoon/java-util` and `Hamjoon/logback`; the no-regeneration run is `experiments/commit-survival/` and the policy run `experiments/regen-policies/` in each. Per-commit tables: https://docs.google.com/spreadsheets/d/1MSN_emRi9AvQZrceqIOdhmyIRAZVpMfxNiYZWANVhZk/edit.
+Report: https://github.com/Hamjoon/test-survival-reports, `2026-11-week1-regen-policies/regen-policies-report.md` (this file). Experiment branches `experiment/2026-11-week1-<project>-regen-policies` in `Hamjoon/ojAlgo`, `Hamjoon/smallrye-config`, `Hamjoon/jinjava`, `Hamjoon/java-util` and `Hamjoon/logback`; the one-time-generation run is `experiments/commit-survival/` and the policy run `experiments/regen-policies/` in each. Per-commit tables: https://docs.google.com/spreadsheets/d/1MSN_emRi9AvQZrceqIOdhmyIRAZVpMfxNiYZWANVhZk/edit.
 
 - Settings: `experiment.yaml`; scope: `population/scope.md`; Dev(scope) of *t*: `dev/dev-scope-denominator.csv`; generation at *t*: `generated/<group>/round*/funnel.md` and `sources/`.
-- No regeneration: `results/survival.csv`, `final-summary.json`, `coverage-commits.csv`, `first-failures.csv`, `skipped-commits.csv`.
+- One-time generation: `results/survival.csv`, `final-summary.json`, `coverage-commits.csv`, `first-failures.csv`, `skipped-commits.csv`.
 - Policies: `results/policy/plan.md`, `summary.csv`, `consistency.md`; per policy `results/policy/<policy>/survival.csv`, `coverage-commits.csv`, `first-failures.csv`; regeneration pools `results/policy/pools/<group>/<commit>/` (funnel and sources).
