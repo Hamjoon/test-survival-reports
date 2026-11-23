@@ -22,7 +22,7 @@ A test set generated at a starting commit *t* breaks as the code moves on. On js
 
 | Policy | When | What |
 |---|---|---|
-| One-time generation | never | the set generated at *t* |
+| One-time generation | at t only | the set generated at *t* is kept for the whole range |
 | Regenerate at each release | 4.51.0, first buildable commit #102 (cc6bf54b); 4.55.0, #231 (32b011eb) | the group is discarded and generated again; Dev is re-established from the developer tests of that commit |
 | Reset when 50% broken | the first commit where half of the group has broken: Dev at #118 (22dde9cf); never reached by Ouédraogo and KTester | the same |
 | Fill when 50% broken | the same commit | new tests are added for the broken ones; Dev stays the set of *t*, so no group changes in this run |
