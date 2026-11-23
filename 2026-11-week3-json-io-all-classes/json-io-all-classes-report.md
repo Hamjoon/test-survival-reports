@@ -1,4 +1,4 @@
-# Do LLM-generated tests stay alive longer than developer tests while executing less of the code? json-io, every class, 300 commits, four regeneration policies
+# Do LLM-generated tests survive longer than developer tests but cover less code? json-io, all classes, 300 commits, four regeneration policies
 
 ## Key findings
 
@@ -70,13 +70,12 @@ The per-commit series (survival and changed-line coverage under each policy) are
 
 1. **Across the seven runs the coverage direction has no exception and the survival direction has some.** Dev executes a larger share of the changed lines than both LLM groups in all seven rows of Table 3. KTester has a larger share alive than Dev in six of seven (not on smallrye-config) and Ouédraogo in four of seven (both java-util runs, logback, json-io). The two runs with all classes give close values: on java-util 50.5%, 62.1% and 69.2% alive and 58.0%, 41.3% and 34.5% of the changed lines; on json-io 42.8%, 65.3% and 69.1% and 53.0%, 26.2% and 35.1%.
 2. **The LLM tests are lost mostly when the code they call changes; the developer tests on json-io are lost mostly at one defect.** 333 of the 387 lost Ouédraogo methods and 486 of the 651 lost KTester methods stopped compiling. 334 of the 581 lost Dev methods failed when run, 276 of them at #118 (22dde9cf), a change to the parser merged as upstream pull request #316. Run again outside the experiment, the 276 pass at #117 (d52b8185), all fail at #118, 189 fail at #119 (9c5cef3f), and all pass at #120 (3266953f), where upstream pull request #318 (titled as fixing the root cause of 174 test errors) was merged, and at each of the 31 later commits checked up to #231 (32b011eb). The same commit takes 399 of the 1,212 methods of the Dev set re-established at #102 (cc6bf54b) and is where Dev reaches the 50% threshold.
-3. **A regenerated LLM set executes about as many lines as the set of *t*, while the project grows.** The executable lines grow from 4,236 at *t* to 6,395 at #299 (7ca09df5). The sets generated at #231 (32b011eb) execute 2,681 (Ouédraogo) and 3,188 (KTester) lines at #299, against 2,501 and 2,797 at *t*; the Dev set re-established at #231 executes 5,242 against 3,518. The distance between Dev and KTester in whole-project coverage is 17 points at *t* and 32 points at #299 with both sets regenerated.
+3. **Regeneration does not close the coverage gap: the regenerated LLM sets execute only a few hundred more lines than the sets generated at t, although the project has grown by 2,159 executable lines.** The executable lines grow from 4,236 at *t* to 6,395 at #299 (7ca09df5). The sets generated at #231 (32b011eb) execute 2,681 (Ouédraogo) and 3,188 (KTester) lines at #299, against 2,501 and 2,797 at *t*; the Dev set re-established at #231 executes 5,242 against 3,518. The gap between Dev and KTester in whole-project coverage is 17 points at *t* and 32 points at #299 when both sets are regenerated.
 
 ## Limitations
 
 - A method that fails once is not run again, so a method lost at a defect that is later repaired stays lost. Run again at #299 (7ca09df5), 290 of the 581 lost Dev methods pass (276 of them lost at #118), 44 of the 651 lost KTester methods and 1 of the 387 lost Ouédraogo methods. This was checked at one commit and for one-time generation only.
 - 30 commits do not build and have no coverage (#29 to #38, #72, #74 to #77, #90 to #95, #111, #136, #182, #183, #241, #248 to #251). json-io depends on java-util of the same maintainer and the required version changes 18 times in the range.
-- 15 developer methods that pass in the project's own build fail at *t* in the experiment's run and are left out of Dev, because the experiment compiles test classes for a newer Java version than the project (Java 8). 6 KTester methods fail a second run at *t* and are left out.
 - One project, one model and one generation run per generation point. The 50% policies were exercised only by Dev and only at the defect commit, where the developer tests of that commit that pass number 815 (1,213 at #102, 1,384 at #231).
 
 ## Repository
