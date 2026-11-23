@@ -74,9 +74,9 @@ The per-commit series (survival and changed-line coverage under each policy) are
 
 ## Limitations
 
-- A method that fails once is not run again, so a method lost at a defect that is later repaired stays lost. Run again at #299 (7ca09df5), 290 of the 581 lost Dev methods pass (276 of them lost at #118), 44 of the 651 lost KTester methods and 1 of the 387 lost Ouédraogo methods. This was checked at one commit and for one-time generation only.
-- 30 commits do not build and have no coverage (#29 to #38, #72, #74 to #77, #90 to #95, #111, #136, #182, #183, #241, #248 to #251). json-io depends on java-util of the same maintainer and the required version changes 18 times in the range.
-- One project, one model and one generation run per generation point. The 50% policies were exercised only by Dev and only at the defect commit, where the developer tests of that commit that pass number 815 (1,213 at #102, 1,384 at #231).
+1. A method that fails once is not run again, so a method lost at a defect that is later repaired stays lost. Run again at #299 (7ca09df5), 290 of the 581 lost Dev methods pass (276 of them lost at #118), 44 of the 651 lost KTester methods and 1 of the 387 lost Ouédraogo methods. This was checked at one commit and for one-time generation only.
+2. 30 commits do not build and have no coverage (#29 to #38, #72, #74 to #77, #90 to #95, #111, #136, #182, #183, #241, #248 to #251). json-io depends on java-util of the same maintainer and the required version changes 18 times in the range.
+3. One project, one model and one generation run per generation point. The 50% policies were exercised only by Dev and only at the defect commit, where the developer tests of that commit that pass number 815 (1,213 at #102, 1,384 at #231).
 
 ## Repository
 
