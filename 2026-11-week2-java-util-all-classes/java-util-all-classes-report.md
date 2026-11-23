@@ -16,7 +16,7 @@ Last week's java-util run generated tests for four scope classes only. Does the 
 
 | Policy | Group | Week 1 (four scope classes) | Week 2 (all classes) |
 |---|---|---:|---:|
-| No regeneration | Dev | 181/346 (52.3%) | 598/1,185 (50.5%) |
+| One-time generation | Dev | 181/346 (52.3%) | 598/1,185 (50.5%) |
 | | KTester | 135/171 (78.9%) | 1,860/2,688 (69.2%) |
 | | Ouédraogo | 241/375 (64.3%) | 2,113/3,403 (62.1%) |
 | Regenerate at each release | Dev | 516/554 (93.1%) | 1,616/1,678 (96.3%) |
@@ -27,7 +27,7 @@ Last week's java-util run generated tests for four scope classes only. Does the 
 
 | Policy | Group | Week 1 (four scope classes, 6,565 lines) | Week 2 (all classes, 11,572 lines) |
 |---|---|---:|---:|
-| No regeneration | Dev | 3,824 (58.2%) | 6,715 (58.0%) |
+| One-time generation | Dev | 3,824 (58.2%) | 6,715 (58.0%) |
 | | KTester | 2,503 (38.1%) | 3,993 (34.5%) |
 | | Ouédraogo | 1,910 (29.1%) | 4,785 (41.3%) |
 | Regenerate at each release | Dev | 3,906 (59.5%) | 7,020 (60.7%) |
